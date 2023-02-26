@@ -95,7 +95,7 @@ function App() {
 
         <div className="flex items-center gap-x-2">
           <div className="h-4 w-4 rounded-full border-l-yellow-400 bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-md" />
-          <p>- Knight's Position</p>
+          <p>- Possible Moves</p>
         </div>
       </div>
     </div>
