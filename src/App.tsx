@@ -43,7 +43,10 @@ function App() {
   const handleSelect = useCallback((row: number, col: number) => {
     const capturable: Cell[] = POSSIBLE_MOVES.reduce(
       (acc: Cell[], [moveX, moveY]) =>
-        row + moveX > 0 && col + moveY > 0
+        row + moveX >= 0 &&
+        row + moveX < 8 &&
+        col + moveY >= 0 &&
+        col + moveY < 8
           ? [...acc, { row: row + moveX, col: col + moveY }]
           : [...acc],
       []
