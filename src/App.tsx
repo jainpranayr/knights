@@ -7,9 +7,18 @@ function App() {
     col: number;
   } | null>(null);
 
-  const handleSelectCell = (row: number, col: number) => {
+  const handleGridClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const cell = (event.target as HTMLDivElement).closest(
+      ".cell"
+    ) as HTMLDivElement;
+
+    if (!cell) return;
+
+    const row = parseInt(cell.dataset.rowIndex || "0", 10);
+    const col = parseInt(cell.dataset.colIndex || "0", 10);
+
     if (selectedCell?.row === row && selectedCell?.col === col) {
-      setSelectedCell(null);
+      return;
     } else {
       setSelectedCell({ row, col });
     }
@@ -17,7 +26,10 @@ function App() {
 
   return (
     <div className="container mx-auto grid h-screen place-content-center bg-gray-50">
-      <div className="grid-rows-8 grid h-full w-full grid-cols-8 border-2 border-gray-500 shadow-md">
+      <div
+        className="grid-rows-8 grid h-full w-full grid-cols-8 border-2 border-gray-500 shadow-md"
+        onClick={handleGridClick}
+      >
         {Array.from({ length: 64 }, (_, index) => {
           const rowIndex = Math.floor(index / 8);
           const colIndex = index % 8;
@@ -26,7 +38,9 @@ function App() {
           return (
             <div
               key={`${rowIndex}-${colIndex}`}
-              onClick={() => handleSelectCell(rowIndex, colIndex)}
+              className="cell"
+              data-row-index={rowIndex}
+              data-col-index={colIndex}
             >
               <Cell
                 isEven={isEven}
