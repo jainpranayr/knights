@@ -1,11 +1,27 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Cell from "./Cell";
+import { KnightIcon } from "./icons";
+import { classNames } from "./utils";
+
+type Cell = {
+  row: number;
+  col: number;
+};
+
+const POSSIBLE_MOVES = [
+  [-2, -1],
+  [-1, -2],
+  [1, -2],
+  [2, -1],
+  [2, 1],
+  [1, 2],
+  [-1, 2],
+  [-2, 1],
+];
 
 function App() {
-  const [selectedCell, setSelectedCell] = useState<{
-    row: number;
-    col: number;
-  } | null>(null);
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+  const [capturableCells, setCapturableCells] = useState<Cell[]>([]);
 
   const handleGridClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const cell = (event.target as HTMLDivElement).closest(
@@ -19,10 +35,23 @@ function App() {
 
     if (selectedCell?.row === row && selectedCell?.col === col) {
       return;
-    } else {
-      setSelectedCell({ row, col });
     }
+
+    handleSelect(row, col);
   };
+
+  const handleSelect = useCallback((row: number, col: number) => {
+    const capturable: Cell[] = POSSIBLE_MOVES.reduce(
+      (acc: Cell[], [moveX, moveY]) =>
+        row + moveX > 0 && col + moveY > 0
+          ? [...acc, { row: row + moveX, col: col + moveY }]
+          : [...acc],
+      []
+    );
+
+    setSelectedCell({ row, col });
+    setCapturableCells(capturable);
+  }, []);
 
   return (
     <div className="container mx-auto grid h-screen place-content-center bg-gray-50">
@@ -33,7 +62,13 @@ function App() {
         {Array.from({ length: 64 }, (_, index) => {
           const rowIndex = Math.floor(index / 8);
           const colIndex = index % 8;
+
           const isEven = (rowIndex + colIndex) % 2 === 0;
+          const isSelected =
+            selectedCell?.row === rowIndex && selectedCell?.col === colIndex;
+          const isCapturable = capturableCells.some(
+            (cell) => cell.row === rowIndex && cell.col === colIndex
+          );
 
           return (
             <div
@@ -44,14 +79,24 @@ function App() {
             >
               <Cell
                 isEven={isEven}
-                isSelected={
-                  selectedCell?.row === rowIndex &&
-                  selectedCell?.col === colIndex
-                }
+                isSelected={isSelected}
+                isCapturable={isCapturable}
               />
             </div>
           );
         })}
+      </div>
+
+      <div className="my-6 flex items-center justify-between gap-x-4">
+        <div className="flex items-center gap-x-2">
+          <KnightIcon className="h-7 w-7 text-black" />
+          <p>- Knight's Position</p>
+        </div>
+
+        <div className="flex items-center gap-x-2">
+          <div className="h-4 w-4 rounded-full border-l-yellow-400 bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-md" />
+          <p>- Knight's Position</p>
+        </div>
       </div>
     </div>
   );
